@@ -21,6 +21,7 @@
 import urllib
 import warnings
 import requests
+import logging
 import mimetypes
 import xml2dict
 import dict2xml
@@ -33,6 +34,7 @@ except ImportError, e:
     from xml.etree import ElementTree
 
 from .version import __author__, __version__  # noqa
+from httplib import HTTPConnection
 
 
 class PrestaShopWebServiceError(Exception):
@@ -103,6 +105,15 @@ class PrestaShopWebService(object):
 
         # optional arguments
         self.debug = debug
+        if self.debug == True:
+            HTTPConnection.debuglevel = 1
+            logging.basicConfig()
+            logging.getLogger().setLevel(logging.DEBUG)
+            requests_log = logging.getLogger("requests.packages.urllib3")
+            requests_log.setLevel(logging.DEBUG)
+            requests_log.propagate = True
+        else:
+            HTTPConnection.debuglevel = 0
 
         if session is None:
             self.client = requests.Session()
